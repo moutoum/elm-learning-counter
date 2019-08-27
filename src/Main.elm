@@ -15,33 +15,61 @@ main =
 
 
 type alias Model =
-    Int
+    List Int
 
 
 type Msg
-    = Increment
-    | Decrement
+    = Increment Int
+    | Decrement Int
+    | AddCounter
 
 
 init : Model
 init =
-    0
+    []
 
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        Increment ->
-            model + 1
+        Increment i ->
+            List.indexedMap
+                (\index value ->
+                    if index == i then
+                        value + 1
 
-        Decrement ->
-            model - 1
+                    else
+                        value
+                )
+                model
+
+        Decrement i ->
+            List.indexedMap
+                (\index value ->
+                    if index == i then
+                        value - 1
+
+                    else
+                        value
+                )
+                model
+
+        AddCounter ->
+            model ++ [ 0 ]
 
 
 view : Model -> Html Msg
 view model =
     div []
-        [ button [ onClick Decrement ] [ text "-" ]
-        , div [ style "display" "inline-block", style "margin" "0 10px", style "min-width" "80px", style "text-align" "center" ] [ text <| String.fromInt model ]
-        , button [ onClick Increment ] [ text "+" ]
+        [ div [] <| List.indexedMap counterView model
+        , button [ onClick <| AddCounter ] [ text "Add counter" ]
+        ]
+
+
+counterView : Int -> Int -> Html Msg
+counterView index value =
+    div [ style "margin-bottom" "10px" ]
+        [ button [ onClick <| Decrement index ] [ text "-" ]
+        , div [ style "display" "inline-block", style "margin" "0 10px", style "min-width" "80px", style "text-align" "center" ] [ text <| String.fromInt value ]
+        , button [ onClick <| Increment index ] [ text "+" ]
         ]
