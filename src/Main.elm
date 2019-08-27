@@ -21,7 +21,8 @@ type alias Model =
 type Msg
     = Increment Int
     | Decrement Int
-    | AddCounter
+    | Remove Int
+    | Add
 
 
 init : Model
@@ -54,7 +55,17 @@ update msg model =
                 )
                 model
 
-        AddCounter ->
+        Remove i ->
+            let
+                before =
+                    List.take i model
+
+                after =
+                    List.drop (i + 1) model
+            in
+            before ++ after
+
+        Add ->
             model ++ [ 0 ]
 
 
@@ -62,7 +73,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ div [] <| List.indexedMap counterView model
-        , button [ onClick <| AddCounter ] [ text "Add counter" ]
+        , button [ onClick <| Add ] [ text "Add counter" ]
         ]
 
 
@@ -72,4 +83,5 @@ counterView index value =
         [ button [ onClick <| Decrement index ] [ text "-" ]
         , div [ style "display" "inline-block", style "margin" "0 10px", style "min-width" "80px", style "text-align" "center" ] [ text <| String.fromInt value ]
         , button [ onClick <| Increment index ] [ text "+" ]
+        , button [ onClick <| Remove index, style "color" "red", style "margin-left" "10px" ] [ text "Delete" ]
         ]
